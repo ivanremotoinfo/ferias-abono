@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Férias e Abono Pecuniário | SuporteADV</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0d0d0d; color: #e0e0e0; padding: 24px 16px; }
+  .container { max-width: 750px; margin: 0 auto; }
+
+  .header { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #222; }
+  h1 { font-size: 1.5rem; color: #008080; margin-bottom: 6px; }
+  .subtitle { font-size: 0.88rem; color: #888; line-height: 1.5; }
+  .brand { font-size: 0.78rem; margin-top: 8px; color: #555; }
+  .brand span.s { color: #8B00FF; font-weight: 700; }
+  .brand span.a { color: #008080; font-weight: 700; }
+
+  .card { background: #111; border-radius: 10px; border: 1px solid #222; border-left: 3px solid #8B00FF; padding: 20px 22px; margin-bottom: 14px; transition: border-left-color 0.2s; }
+  .card:hover { border-left-color: #008080; }
+  .card-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #008080; font-weight: 700; margin-bottom: 16px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  @media (max-width: 520px) { .form-grid { grid-template-columns: 1fr; } }
+  .field.full { grid-column: 1 / -1; }
+
+  .field label { display: block; font-size: 0.78rem; color: #888; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .field input, .field select {
+    width: 100%; padding: 9px 11px; border: 1.5px solid #333; border-radius: 6px;
+    font-size: 0.95rem; color: #fff; background: #1a1a1a; transition: border-color 0.2s;
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: #008080; box-shadow: 0 0 0 2px rgba(0,128,128,0.2); }
+  .field select option { background: #1a1a1a; }
+
+  .info-box { background: #0d1a1a; border: 1px solid #1a3a3a; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-size: 0.82rem; color: #666; line-height: 1.6; }
+  .info-box b { color: #008080; }
+
+  /* Toggle abono */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1a1a1a; margin-bottom: 8px; }
+  .toggle-info .t-nome { font-size: 0.88rem; color: #ccc; font-weight: 600; }
+  .toggle-info .t-desc { font-size: 0.72rem; color: #555; margin-top: 2px; }
+  .toggle-switch { position: relative; width: 42px; height: 22px; flex-shrink: 0; margin-left: 12px; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider { position: absolute; inset: 0; background: #333; border-radius: 22px; cursor: pointer; transition: 0.2s; }
+  .toggle-slider:before { content: ''; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background: #666; border-radius: 50%; transition: 0.2s; }
+  input:checked + .toggle-slider { background: #008080; }
+  input:checked + .toggle-slider:before { transform: translateX(20px); background: #fff; }
+
+  button.calcular { background: #008080; color: #fff; border: none; padding: 10px 26px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.07em; cursor: pointer; transition: background 0.18s; text-transform: uppercase; }
+  button.calcular:hover { background: #006666; box-shadow: 0 0 10px rgba(0,128,128,0.4); }
+
+  /* Resultado */
+  .resultado { background: #0a1a0a; border: 1px solid #1a4a1a; border-radius: 10px; padding: 20px 22px; margin-top: 14px; display: none; }
+  .resultado.visible { display: block; }
+  .resultado-titulo { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #008080; font-weight: 700; margin-bottom: 16px; }
+
+  .res-principal { text-align: center; margin-bottom: 20px; }
+  .res-principal label { display: block; font-size: 0.72rem; color: #555; text-transform: uppercase; margin-bottom: 6px; }
+  .res-principal .v { font-size: 1.8rem; font-weight: 700; color: #00ff00; font-family: 'Courier New', monospace; }
+  .res-principal .sub { font-size: 0.82rem; color: #555; margin-top: 4px; }
+
+  /* Cards de períodos */
+  .periodos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .periodo-card { background: #111; border-radius: 8px; border: 1px solid #1a1a1a; padding: 14px; }
+  .periodo-card.ferias { border-top: 3px solid #008080; }
+  .periodo-card.abono { border-top: 3px solid #8B00FF; }
+  .periodo-card .pc-titulo { font-size: 0.72rem; text-transform: uppercase; color: #555; font-weight: 700; margin-bottom: 8px; }
+  .periodo-card.ferias .pc-titulo { color: #008080; }
+  .periodo-card.abono .pc-titulo { color: #8B00FF; }
+  .periodo-card .pc-dias { font-size: 1.2rem; font-weight: 700; color: #ccc; margin-bottom: 4px; }
+  .periodo-card .pc-valor { font-size: 1rem; font-weight: 700; font-family: 'Courier New', monospace; }
+  .periodo-card.ferias .pc-valor { color: #008080; }
+  .periodo-card.abono .pc-valor { color: #8B00FF; }
+  .periodo-card .pc-detalhe { font-size: 0.72rem; color: #444; margin-top: 4px; }
+
+  .res-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 520px) { .res-grid { grid-template-columns: 1fr 1fr; } }
+  .res-item label { display: block; font-size: 0.72rem; color: #555; text-transform: uppercase; margin-bottom: 4px; }
+  .res-item .valor { font-size: 1rem; font-weight: 700; color: #ccc; font-family: 'Courier New', monospace; }
+  .res-item .valor.teal { color: #008080; }
+  .res-item .valor.sec { color: #555; font-size: 0.9rem; }
+
+  .divider { border: none; border-top: 1px solid #1a3a1a; margin: 14px 0; }
+
+  .comp-lista { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .comp-item { display: flex; justify-content: space-between; padding: 10px 14px; background: #111; border-radius: 8px; border-left: 3px solid #333; }
+  .comp-item.teal { border-left-color: #008080; }
+  .comp-item.roxo { border-left-color: #8B00FF; }
+  .comp-item.total { background: #0d1a0d; border-left-color: #00ff00; }
+  .comp-item .ci-nome { font-size: 0.85rem; color: #888; }
+  .comp-item .ci-valor { font-size: 0.95rem; font-weight: 700; font-family: 'Courier New', monospace; color: #008080; }
+  .comp-item.total .ci-nome { color: #fff; font-weight: 700; }
+  .comp-item.total .ci-valor { color: #00ff00; font-size: 1.05rem; }
+
+  /* Tabela faltas */
+  .faltas-wrap { margin-top: 14px; }
+  .faltas-wrap summary { cursor: pointer; color: #555; font-size: 0.78rem; margin-bottom: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th { text-align: left; color: #555; padding: 6px 8px; border-bottom: 1px solid #222; font-size: 0.72rem; text-transform: uppercase; }
+  td { color: #999; padding: 6px 8px; border-bottom: 1px solid #1a1a1a; }
+  tr:hover td { background: #151515; }
+  td.dest { color: #00ff00; font-weight: 700; font-family: 'Courier New', monospace; }
+  tr.atual { background: #0a1a0a; }
+
+  .erro { background: #1a0a0a; border: 1px solid #4a1a1a; border-radius: 8px; padding: 14px 16px; color: #ff6666; font-size: 0.88rem; margin-top: 14px; display: none; }
+  .erro.visible { display: block; }
+  .aviso { font-size: 0.72rem; color: #444; margin-top: 12px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Férias e Abono Pecuniário</h1>
+    <p class="subtitle">Calcule férias integrais, proporcionais, abono pecuniário (1/3 das férias vendidas) e o terço constitucional. Base: CLT, arts. 130-148.</p>
+    <p class="brand"><span class="s">suporte</span><span class="a">ADV</span>.br — Ferramentas para Advogados</p>
+  </div>
+
+  <div class="card">
+    <div class="info-box">
+      <b>Regras gerais (CLT):</b> Férias = 30 dias após 12 meses de trabalho + 1/3 constitucional (CF, art. 7º, XVII). O empregado pode vender até 1/3 das férias (abono pecuniário = 10 dias). Faltas injustificadas reduzem o período de férias.
+    </div>
+
+    <div class="card-label">Dados do Empregado</div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Salário mensal (R$)</label>
+        <input type="number" id="salario" placeholder="Ex: 3000,00" step="0.01" min="0">
+      </div>
+      <div class="field">
+        <label>Tipo de férias</label>
+        <select id="tipoFerias">
+          <option value="integrais">Férias integrais (período aquisitivo completo)</option>
+          <option value="proporcionais">Férias proporcionais (rescisão)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Meses trabalhados no período (proporcional)</label>
+        <input type="number" id="mesesTrabalhados" value="12" min="1" max="12" placeholder="1 a 12">
+      </div>
+      <div class="field">
+        <label>Faltas injustificadas no período</label>
+        <input type="number" id="faltas" value="0" min="0" max="32" placeholder="0">
+      </div>
+      <div class="field">
+        <label>Adicionais variáveis médios (R$/mês)</label>
+        <input type="number" id="medias" placeholder="Comissões, horas extras médias..." step="0.01" min="0" value="0">
+      </div>
+      <div class="field">
+        <label>Número de dependentes (IR)</label>
+        <input type="number" id="dependentes" value="0" min="0" max="20" placeholder="0">
+      </div>
+    </div>
+
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <div class="t-nome">Abono Pecuniário (vender 10 dias)</div>
+        <div class="t-desc">Empregado converte 1/3 das férias em dinheiro. Só pode ser solicitado até 15 dias antes do início das férias.</div>
+      </div>
+      <label class="toggle-switch"><input type="checkbox" id="tog-abono" checked><span class="toggle-slider"></span></label>
+    </div>
+
+    <button class="calcular" onclick="calcular()" style="margin-top:14px">CALCULAR</button>
+  </div>
+
+  <div class="erro" id="erro"></div>
+
+  <div class="resultado" id="resultado">
+    <div class="resultado-titulo" id="res-titulo">Férias e Abono Pecuniário</div>
+
+    <div class="res-principal">
+      <label>💰 Total a receber</label>
+      <div class="v" id="res-total">—</div>
+      <div class="sub" id="res-sub">—</div>
+    </div>
+
+    <div class="periodos-grid">
+      <div class="periodo-card ferias">
+        <div class="pc-titulo">🏖️ Férias a gozar</div>
+        <div class="pc-dias" id="res-dias-ferias">— dias</div>
+        <div class="pc-valor" id="res-valor-ferias">—</div>
+        <div class="pc-detalhe" id="res-detalhe-ferias">—</div>
+      </div>
+      <div class="periodo-card abono" id="card-abono">
+        <div class="pc-titulo">💵 Abono pecuniário</div>
+        <div class="pc-dias" id="res-dias-abono">— dias</div>
+        <div class="pc-valor" id="res-valor-abono">—</div>
+        <div class="pc-detalhe">1/3 das férias convertidas em dinheiro</div>
+      </div>
+    </div>
+
+    <div class="res-grid">
+      <div class="res-item"><label>Salário diário</label><div class="valor teal" id="res-dia">—</div></div>
+      <div class="res-item"><label>Dias de férias</label><div class="valor" id="res-dias-total">—</div></div>
+      <div class="res-item"><label>Faltas deduzidas</label><div class="valor sec" id="res-faltas">—</div></div>
+    </div>
+
+    <hr class="divider">
+    <div class="resultado-titulo">Composição</div>
+    <div class="comp-lista" id="comp-lista"></div>
+
+    <details class="faltas-wrap">
+      <summary>Ver tabela de redução de férias por faltas (CLT, art. 130)</summary>
+      <table>
+        <thead><tr><th>Faltas injustificadas</th><th>Dias de férias</th></tr></thead>
+        <tbody id="tabela-faltas"></tbody>
+      </table>
+    </details>
+
+    <p class="aviso">⚠️ O terço de férias (1/3) incide sobre o salário integral incluindo médias de horas extras, adicionais etc. (TST, Súmula 115). O abono pecuniário não é base de cálculo para FGTS e INSS (CLT, art. 144). Verifique a convenção coletiva para eventuais benefícios adicionais.</p>
+  </div>
+
+</div>
+
+<script>
+// Tabela de dias de férias por faltas — CLT art. 130
+const tabelaFaltas = [
+  { de:0, ate:5, dias:30 },
+  { de:6, ate:14, dias:24 },
+  { de:15, ate:23, dias:18 },
+  { de:24, ate:32, dias:12 },
+];
+
+function diasFeriasPorFaltas(faltas) {
+  const reg = tabelaFaltas.find(r => faltas >= r.de && faltas <= r.ate);
+  return reg ? reg.dias : 0;
+}
+
+function fmtMoeda(v) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+
+function showErro(msg) {
+  document.getElementById('erro').textContent = msg;
+  document.getElementById('erro').classList.add('visible');
+  document.getElementById('resultado').classList.remove('visible');
+}
+function hideErro() { document.getElementById('erro').classList.remove('visible'); }
+
+function calcular() {
+  hideErro();
+  const salario = parseFloat(document.getElementById('salario').value);
+  if (!salario || salario <= 0) return showErro('Informe o salário mensal.');
+
+  const tipoFerias = document.getElementById('tipoFerias').value;
+  const meses = parseInt(document.getElementById('mesesTrabalhados').value) || 12;
+  const faltas = parseInt(document.getElementById('faltas').value) || 0;
+  const medias = parseFloat(document.getElementById('medias').value) || 0;
+  const togAbono = document.getElementById('tog-abono').checked;
+
+  if (faltas > 32) return showErro('Mais de 32 faltas: empregado perde o direito às férias no período.');
+
+  const salarioBase = salario + medias;
+  const salarioDia = salarioBase / 30;
+
+  // Dias de férias conforme faltas
+  const diasMaximos = diasFeriasPorFaltas(faltas);
+  if (diasMaximos === 0) return showErro('Com mais de 32 faltas o empregado perde o direito a férias no período.');
+
+  // Proporcional
+  let diasFerias;
+  if (tipoFerias === 'proporcionais') {
+    diasFerias = Math.floor(diasMaximos * meses / 12);
+  } else {
+    diasFerias = diasMaximos;
+  }
+
+  // Abono pecuniário = 1/3 dos dias (máximo 10 dias)
+  const diasAbono = togAbono ? Math.floor(diasFerias / 3) : 0;
+  const diasGozar = diasFerias - diasAbono;
+
+  // Valores
+  const valorFeriasBase = salarioDia * diasGozar;
+  const tercoFerias = valorFeriasBase / 3;
+  const valorFeriasMaisAdicional = valorFeriasBase + tercoFerias;
+
+  const valorAbonoBase = togAbono ? salarioDia * diasAbono : 0;
+  const tercoAbono = togAbono ? valorAbonoBase / 3 : 0;
+  const valorAbonoTotal = valorAbonoBase + tercoAbono;
+
+  const total = valorFeriasMaisAdicional + valorAbonoTotal;
+
+  // Preenche
+  document.getElementById('res-titulo').textContent = tipoFerias === 'integrais' ? 'Férias Integrais' : `Férias Proporcionais (${meses} meses)`;
+  document.getElementById('res-total').textContent = fmtMoeda(total);
+  document.getElementById('res-sub').textContent = `${diasGozar} dias de gozo + ${diasAbono} dias de abono | 1/3 constitucional incluído`;
+  document.getElementById('res-dia').textContent = fmtMoeda(salarioDia);
+  document.getElementById('res-dias-total').textContent = diasFerias + ' dias';
+  document.getElementById('res-faltas').textContent = faltas > 0 ? `${faltas} faltas → ${diasMaximos} dias` : 'Nenhuma';
+
+  document.getElementById('res-dias-ferias').textContent = diasGozar + ' dias';
+  document.getElementById('res-valor-ferias').textContent = fmtMoeda(valorFeriasMaisAdicional);
+  document.getElementById('res-detalhe-ferias').textContent = `Salário (${fmtMoeda(valorFeriasBase)}) + 1/3 (${fmtMoeda(tercoFerias)})`;
+
+  document.getElementById('card-abono').style.opacity = togAbono ? '1' : '0.4';
+  document.getElementById('res-dias-abono').textContent = diasAbono + ' dias';
+  document.getElementById('res-valor-abono').textContent = fmtMoeda(valorAbonoTotal);
+
+  // Composição
+  const lista = document.getElementById('comp-lista');
+  lista.innerHTML = '';
+  const addItem = (nome, valor, cls='', tot=false) => {
+    const div = document.createElement('div');
+    div.className = `comp-item${cls?' '+cls:''}${tot?' total':''}`;
+    div.innerHTML = `<span class="ci-nome">${nome}</span><span class="ci-valor">${fmtMoeda(valor)}</span>`;
+    lista.appendChild(div);
+  };
+  addItem('Salário base', salarioBase);
+  if (medias > 0) addItem('Médias variáveis incluídas', medias);
+  addItem(`Férias a gozar (${diasGozar} dias × ${fmtMoeda(salarioDia)})`, valorFeriasBase, 'teal');
+  addItem('1/3 constitucional sobre férias', tercoFerias, 'teal');
+  if (togAbono) {
+    addItem(`Abono pecuniário (${diasAbono} dias × ${fmtMoeda(salarioDia)})`, valorAbonoBase, 'roxo');
+    addItem('1/3 constitucional sobre abono', tercoAbono, 'roxo');
+  }
+  addItem('TOTAL A RECEBER', total, '', true);
+
+  // Tabela de faltas
+  const tbody = document.getElementById('tabela-faltas');
+  tbody.innerHTML = '';
+  tabelaFaltas.forEach(t => {
+    const tr = document.createElement('tr');
+    const isAtual = faltas >= t.de && faltas <= t.ate;
+    if (isAtual) tr.className = 'atual';
+    tr.innerHTML = `
+      <td>${t.de === 0 ? '0 a 5' : `${t.de} a ${t.ate}`} faltas${isAtual?' ◀ atual':''}</td>
+      <td class="dest">${t.dias} dias</td>`;
+    tbody.appendChild(tr);
+  });
+  const trPerda = document.createElement('tr');
+  trPerda.innerHTML = '<td>Acima de 32 faltas</td><td style="color:#ff4444;font-weight:700">Perde o direito</td>';
+  tbody.appendChild(trPerda);
+
+  document.getElementById('resultado').classList.add('visible');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { const f = document.activeElement; if (f && (f.tagName==='INPUT'||f.tagName==='SELECT')) calcular(); }
+});
+</script>
+</body>
+</html>
